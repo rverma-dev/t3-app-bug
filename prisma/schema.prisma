@@ -34,11 +34,11 @@ model Account {
     provider                 String
     providerAccountId        String
     refresh_token            String? @db.Text
-    access_token             String? // @db.Text
+    access_token             String? @db.Text
     expires_at               Int?
     token_type               String?
     scope                    String?
-    id_token                 String? // @db.Text
+    id_token                 String? @db.Text
     session_state            String?
     user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
     refresh_token_expires_in Int?
@@ -63,6 +63,8 @@ model User {
     accounts      Account[]
     sessions      Session[]
     posts         Post[]
+    comments                 Comment[]
+    videos                   Video[]
 }
 
 model VerificationToken {
@@ -71,4 +73,42 @@ model VerificationToken {
     expires    DateTime
 
     @@unique([identifier, token])
+}
+
+
+model Video {
+  id          String    @id @default(cuid())
+  title       String
+  description String? // Description of the video
+  thumbnail   String?
+  url         String
+  uploadId    String
+  userId      String
+  status      String
+  duration    Int? // Duration of the video in seconds
+  format      String? // Format of the video file (e.g., "mp4", "avi")
+  size        Int? // Size of the video file in bytes
+  resolution  String? // Resolution of the video (e.g., "1080p", "720p")
+  views       Int       @default(0) // Number of views
+  likes       Int       @default(0) // Number of likes
+  dislikes    Int       @default(0) // Number of dislikes
+  comments    Comment[] // Comments on the video
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  user        User      @relation(fields: [userId], references: [id])
+
+  @@map("videos")
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  userId    String
+  videoId   String
+  text      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
+  video     Video    @relation(fields: [videoId], references: [id])
+
+  @@map("comments")
 }

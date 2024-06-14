@@ -3,6 +3,7 @@ import Link from "next/link";
 import { CreatePost } from "@/app/_components/create-post";
 import { auth } from "@/server/auth";
 import { api } from "@/trpc/server";
+import { CreateVideo } from "./_components/create-video";
 
 export default async function Home() {
   const hello = await api.post.hello({ text: "from tRPC" });
@@ -67,16 +68,25 @@ async function CrudShowcase() {
   if (!session?.user) return null;
 
   const latestPost = await api.post.getLatest();
+  const latestVideo = await api.video.getLatest();
 
   return (
-    <div className="w-full max-w-xs">
-      {latestPost ? (
-        <p className="truncate">Your most recent post: {latestPost.name}</p>
-      ) : (
-        <p>You have no posts yet.</p>
-      )}
-
-      <CreatePost />
-    </div>
+    <div className="w-full max-w-l flex">
+      <div className="w-1/2">
+        {latestPost ? (
+          <p className="truncate">Your most recent post: {latestPost.name}</p>
+        ) : (
+          <p>You have no posts yet.</p>
+        )}
+        <CreatePost />
+      </div>
+      <div className="w-1/2"></div>
+        {latestVideo ? (
+          <p className="truncate">Your most recent video: {latestVideo.title}</p>
+        ) : (
+          <p>You have no videos yet.</p>
+        )}
+        <CreateVideo />
+      </div>
   );
 }
